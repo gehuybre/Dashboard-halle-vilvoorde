@@ -23,8 +23,8 @@ def filter_periode(df, start_jaar, start_maand, end_jaar, end_maand):
             # Eerste jaar: vanaf start_maand
             result.append(year_data[year_data['CD_PERIOD'] >= start_maand])
         elif year == end_jaar:
-            # Laatste jaar: tot end_maand
-            result.append(year_data[year_data['CD_PERIOD'] <= end_maand])
+            # Laatste jaar: tot end_maand (maar exclude periode 0)
+            result.append(year_data[(year_data['CD_PERIOD'] <= end_maand) & (year_data['CD_PERIOD'] > 0)])
         else:
             # Tussenliggende jaren: alle maanden
             result.append(year_data[year_data['CD_PERIOD'] > 0])  # Exclude period 0 (totaal)
