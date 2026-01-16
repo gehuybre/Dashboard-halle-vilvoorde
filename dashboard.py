@@ -375,15 +375,15 @@ with tab1:
     
     with col2:
         # Top 10 gemeenten met meeste flatgebouwen
-        top_flats = df_filtered.nlargest(10, 'Flatgebouwen_2025')[['TX_REFNIS_NL', 'Flatgebouwen_2025']]
+        top_flats = df_filtered.nlargest(10, 'Appartementen_2025')[['TX_REFNIS_NL', 'Appartementen_2025']]
         fig2 = px.bar(
             top_flats,
-            x='Flatgebouwen_2025',
+            x='Appartementen_2025',
             y='TX_REFNIS_NL',
             orientation='h',
             title='Top 10 gemeenten - aantal flatgebouwen',
-            labels={'Flatgebouwen_2025': 'Aantal flatgebouwen', 'TX_REFNIS_NL': ''},
-            color='Flatgebouwen_2025',
+            labels={'Appartementen_2025': 'Aantal flatgebouwen', 'TX_REFNIS_NL': ''},
+            color='Appartementen_2025',
             color_continuous_scale=[[0, '#d97706'], [1, '#b91c1c']]
         )
         fig2.update_layout(**get_plotly_layout(), showlegend=False, height=450)
@@ -394,7 +394,7 @@ with tab1:
     
     # Ratio flats/huizen
     df_ratio = df_filtered.copy()
-    df_ratio['Flats_ratio'] = (df_ratio['Flatgebouwen_2025'] / df_ratio['Huizen_totaal_2025'] * 100).round(2)
+    df_ratio['Flats_ratio'] = (df_ratio['Appartementen_2025'] / df_ratio['Huizen_totaal_2025'] * 100).round(2)
     top_ratio = df_ratio.nlargest(15, 'Flats_ratio')[['TX_REFNIS_NL', 'Flats_ratio']]
     
     fig3 = px.bar(
@@ -647,7 +647,7 @@ with tab4:
     with col2:
         # Flatgebouwen ratio vs huishoudens 1-2 personen
         df_scatter2 = df_filtered.copy()
-        df_scatter2['Flats_ratio'] = (df_scatter2['Flatgebouwen_2025'] / df_scatter2['Huizen_totaal_2025'] * 100)
+        df_scatter2['Flats_ratio'] = (df_scatter2['Appartementen_2025'] / df_scatter2['Huizen_totaal_2025'] * 100)
         df_scatter2['Klein_hh_pct'] = df_scatter2['hh_1_pct_toename'] + df_scatter2['hh_2_pct_toename']
         df_scatter2 = df_scatter2.dropna(subset=['Flats_ratio', 'Klein_hh_pct'])
         
@@ -710,7 +710,7 @@ with tab4:
                 'Groot_hh_abs': 'Toename 3-4+ persoons HH (voorspelling 2025-2040)'
             },
             trendline='ols',
-            color='Flatgebouwen_2025',
+            color='Appartementen_2025',
             color_continuous_scale=[[0, '#f59e0b'], [1, '#d97706']]
         )
         fig14.update_layout(**get_plotly_layout(), height=450, coloraxis_colorbar_title_text="")
@@ -736,8 +736,8 @@ with tab5:
         with col1:
             st.markdown("### Gebouwenpark 2025")
             st.metric("Totaal huizen", f"{int(gemeente_data['Huizen_totaal_2025']):,}")
-            st.metric("Flatgebouwen", f"{int(gemeente_data['Flatgebouwen_2025']):,}")
-            st.metric("Flats ratio", f"{(gemeente_data['Flatgebouwen_2025']/gemeente_data['Huizen_totaal_2025']*100):.2f}%")
+            st.metric("Flatgebouwen", f"{int(gemeente_data['Appartementen_2025']):,}")
+            st.metric("Flats ratio", f"{(gemeente_data['Appartementen_2025']/gemeente_data['Huizen_totaal_2025']*100):.2f}%")
         
         with col2:
             st.markdown("### Huishoudens toename 2025-2040")
@@ -887,7 +887,7 @@ with tab5:
     column_names = {
         'TX_REFNIS_NL': 'Gemeente',
         'Huizen_totaal_2025': 'Huizen 2025',
-        'Flatgebouwen_2025': 'Flatgebouwen 2025',
+        'Appartementen_2025': 'Flatgebouwen 2025',
         'hh_1_pct_toename': 'HH 1p %',
         'hh_2_pct_toename': 'HH 2p %',
         'hh_3_pct_toename': 'HH 3p %',
@@ -905,7 +905,7 @@ with tab5:
     }
     
     # Selecteer en hernoem kolommen
-    cols_to_show = ['TX_REFNIS_NL', 'Huizen_totaal_2025', 'Flatgebouwen_2025',
+    cols_to_show = ['TX_REFNIS_NL', 'Huizen_totaal_2025', 'Appartementen_2025',
                     'hh_1_pct_toename', 'hh_2_pct_toename', 'hh_3_pct_toename', 'hh_4+_pct_toename',
                     'hh_1_abs_toename', 'hh_2_abs_toename', 'hh_3_abs_toename', 'hh_4+_abs_toename',
                     'Woningen_Nieuwbouw_2019sep-2022aug', 'Woningen_Nieuwbouw_2022sep-2025aug', 'Woningen_Nieuwbouw_pct_verschil_36m',
