@@ -642,10 +642,30 @@ with tab4:
         )
         fig11.update_layout(**get_plotly_layout(), height=450, coloraxis_colorbar_title_text="")
         fig11.update_traces(textposition='top center', textfont_size=8, marker_line_color='#ffffff', marker_line_width=1)
+        # Voeg probleemzone arcering toe als kwart cirkel (alleen linksboven kwadrant)
+        x_max = df_scatter1['Totaal_hh_toename'].max()
+        y_0 = 0
+        x_range = df_scatter1['Totaal_hh_toename'].max() - df_scatter1['Totaal_hh_toename'].min()
+        y_range = df_scatter1['Woningen_Nieuwbouw_2022sep-2025aug'].max() - df_scatter1['Woningen_Nieuwbouw_2022sep-2025aug'].min()
+        radius = max(x_range, y_range) * 0.8
+        # Teken meerdere kwart cirkels met toenemende opacity voor gradient effect
+        for i, opacity in enumerate([0.12, 0.09, 0.06, 0.03, 0.01]):
+            r = radius * (1 - i * 0.18)
+            # SVG path voor kwart cirkel: start boven, arc naar links, lijn naar centrum
+            path = f'M {x_max},{y_0 + r} A {r},{r} 0 0 0 {x_max - r},{y_0} L {x_max},{y_0} Z'
+            fig11.add_shape(
+                type="path",
+                path=path,
+                fillcolor='#b91c1c',
+                opacity=opacity,
+                line=dict(width=0),
+                layer='below'
+            )
         st.plotly_chart(fig11, use_container_width=True)
+        st.markdown("<p style='font-size: 0.9em; color: #4a5568; font-style: italic;'>Hoge huishoudensgroei met lage nieuwbouw (rechts onder) duidt op toenemende druk op de woningmarkt en betaalbaarheidsproblemen.</p>", unsafe_allow_html=True)
     
     with col2:
-        # Appartementen ratio vs huishoudens 1-2 personen
+        # Appartementen ratio vs huishoudens 1-2 personen - OMGEDRAAID: hh op x-as
         df_scatter2 = df_filtered.copy()
         df_scatter2['Flats_ratio'] = (df_scatter2['Appartementen_2025'] / df_scatter2['Huizen_totaal_2025'] * 100)
         df_scatter2['Klein_hh_pct'] = df_scatter2['hh_1_pct_toename'] + df_scatter2['hh_2_pct_toename']
@@ -653,69 +673,129 @@ with tab4:
         
         fig12 = px.scatter(
             df_scatter2,
-            x='Flats_ratio',
-            y='Klein_hh_pct',
+            x='Klein_hh_pct',
+            y='Flats_ratio',
             text='TX_REFNIS_NL',
-            title='Huidige flats ratio (2025) vs voorspelde groei kleine huishoudens (2025-2040)',
+            title='Voorspelde groei kleine huishoudens (2025-2040) vs huidige flats ratio (2025)',
             labels={
-                'Flats_ratio': 'Ratio appartementen (% van totaal, 2025)',
-                'Klein_hh_pct': 'Toename 1+2 persoons HH (% voorspelling 2025-2040)'
+                'Klein_hh_pct': 'Toename 1+2 persoons HH (% voorspelling 2025-2040)',
+                'Flats_ratio': 'Ratio appartementen (% van totaal, 2025)'
             },
             trendline='ols',
-            color='Huizen_totaal_2025',
+            size='Huizen_totaal_2025',
+            color='Klein_hh_pct',
             color_continuous_scale=[[0, '#d97706'], [1, '#b91c1c']]
         )
         fig12.update_layout(**get_plotly_layout(), height=450, coloraxis_colorbar_title_text="")
         fig12.update_traces(textposition='top center', textfont_size=8, marker_line_color='#ffffff', marker_line_width=1)
+        # Voeg probleemzone arcering toe als kwart cirkel (alleen linksboven kwadrant)
+        x_max = df_scatter2['Klein_hh_pct'].max()
+        y_0 = 0
+        x_range = df_scatter2['Klein_hh_pct'].max() - df_scatter2['Klein_hh_pct'].min()
+        y_range = df_scatter2['Flats_ratio'].max() - df_scatter2['Flats_ratio'].min()
+        radius = max(x_range, y_range) * 0.8
+        for i, opacity in enumerate([0.12, 0.09, 0.06, 0.03, 0.01]):
+            r = radius * (1 - i * 0.18)
+            path = f'M {x_max},{y_0 + r} A {r},{r} 0 0 0 {x_max - r},{y_0} L {x_max},{y_0} Z'
+            fig12.add_shape(
+                type="path",
+                path=path,
+                fillcolor='#b91c1c',
+                opacity=opacity,
+                line=dict(width=0),
+                layer='below'
+            )
         st.plotly_chart(fig12, use_container_width=True)
+        st.markdown("<p style='font-size: 0.9em; color: #4a5568; font-style: italic;'>Hoge groei kleine huishoudens met lage appartementen-ratio (rechts onder) wijst op een mismatch tussen woningtype en demografie.</p>", unsafe_allow_html=True)
     
     # Correlatie tussen nieuwbouw en renovatie
     col1, col2 = st.columns(2)
     
     with col1:
-        df_scatter3 = df_filtered.dropna(subset=['Woningen_Nieuwbouw_2022sep-2025aug', 'Gebouwen_Renovatie_2022sep-2025aug'])
+        # Nieuwbouw vs huishoudens - AANGEPAST: hh op x-as
+        df_scatter3 = df_filtered.copy()
+        df_scatter3['Totaal_hh_toename'] = df_scatter3[hh_abs_cols].sum(axis=1)
+        df_scatter3 = df_scatter3.dropna(subset=['Totaal_hh_toename', 'Gebouwen_Renovatie_2022sep-2025aug'])
         
         fig13 = px.scatter(
             df_scatter3,
-            x='Woningen_Nieuwbouw_2022sep-2025aug',
+            x='Totaal_hh_toename',
             y='Gebouwen_Renovatie_2022sep-2025aug',
             text='TX_REFNIS_NL',
-            title='Nieuwbouw vs renovatie - bouwactiviteit laatste 3 jaar (sept 2022 - aug 2025)',
+            title='Voorspelde huishoudensgroei (2025-2040) vs recente renovatie (2022-2025)',
             labels={
-                'Woningen_Nieuwbouw_2022sep-2025aug': 'Nieuwbouw woningen (sept 2022 - aug 2025)',
+                'Totaal_hh_toename': 'Totale toename huishoudens (voorspelling 2025-2040)',
                 'Gebouwen_Renovatie_2022sep-2025aug': 'Renovatie gebouwen (sept 2022 - aug 2025)'
             },
             trendline='ols',
-            color='Huizen_totaal_2025',
+            size='Huizen_totaal_2025',
+            color='Totaal_hh_toename',
             color_continuous_scale=[[0, '#2d6a4f'], [1, '#14532d']]
         )
         fig13.update_layout(**get_plotly_layout(), height=450, coloraxis_colorbar_title_text="")
         fig13.update_traces(textposition='top center', textfont_size=8, marker_line_color='#ffffff', marker_line_width=1)
+        # Voeg probleemzone arcering toe als kwart cirkel (alleen linksboven kwadrant)
+        x_max = df_scatter3['Totaal_hh_toename'].max()
+        y_0 = 0
+        x_range = df_scatter3['Totaal_hh_toename'].max() - df_scatter3['Totaal_hh_toename'].min()
+        y_range = df_scatter3['Gebouwen_Renovatie_2022sep-2025aug'].max() - df_scatter3['Gebouwen_Renovatie_2022sep-2025aug'].min()
+        radius = max(x_range, y_range) * 0.8
+        for i, opacity in enumerate([0.12, 0.09, 0.06, 0.03, 0.01]):
+            r = radius * (1 - i * 0.18)
+            path = f'M {x_max},{y_0 + r} A {r},{r} 0 0 0 {x_max - r},{y_0} L {x_max},{y_0} Z'
+            fig13.add_shape(
+                type="path",
+                path=path,
+                fillcolor='#b91c1c',
+                opacity=opacity,
+                line=dict(width=0),
+                layer='below'
+            )
         st.plotly_chart(fig13, use_container_width=True)
+        st.markdown("<p style='font-size: 0.9em; color: #4a5568; font-style: italic;'>Hoge huishoudensgroei met weinig renovatie (rechts onder) betekent dat er beperkt bestaande woningen worden aangepast aan nieuwe behoeften.</p>", unsafe_allow_html=True)
     
     with col2:
-        # Huizen totaal vs grootgezinnen (3 en 4+ personen)
+        # Grootgezinnen vs woningvoorraad - AANGEPAST: hh op x-as, voorraad op y-as
         df_scatter4 = df_filtered.copy()
         df_scatter4['Groot_hh_abs'] = df_scatter4['hh_3_abs_toename'] + df_scatter4['hh_4+_abs_toename']
         df_scatter4 = df_scatter4.dropna(subset=['Huizen_totaal_2025', 'Groot_hh_abs'])
         
         fig14 = px.scatter(
             df_scatter4,
-            x='Huizen_totaal_2025',
-            y='Groot_hh_abs',
+            x='Groot_hh_abs',
+            y='Huizen_totaal_2025',
             text='TX_REFNIS_NL',
-            title='Huidige woningvoorraad (2025) vs voorspelde groei grote huishoudens (2025-2040)',
+            title='Voorspelde groei grote huishoudens (2025-2040) vs huidige woningvoorraad (2025)',
             labels={
-                'Huizen_totaal_2025': 'Totaal huizen (stand 2025)',
-                'Groot_hh_abs': 'Toename 3-4+ persoons HH (voorspelling 2025-2040)'
+                'Groot_hh_abs': 'Toename 3-4+ persoons HH (voorspelling 2025-2040)',
+                'Huizen_totaal_2025': 'Totaal huizen (stand 2025)'
             },
             trendline='ols',
-            color='Appartementen_2025',
+            size='Huizen_totaal_2025',
+            color='Groot_hh_abs',
             color_continuous_scale=[[0, '#f59e0b'], [1, '#d97706']]
         )
         fig14.update_layout(**get_plotly_layout(), height=450, coloraxis_colorbar_title_text="")
         fig14.update_traces(textposition='top center', textfont_size=8, marker_line_color='#ffffff', marker_line_width=1)
+        # Voeg probleemzone arcering toe als kwart cirkel (alleen linksboven kwadrant)
+        x_max = df_scatter4['Groot_hh_abs'].max()
+        y_0 = 0
+        x_range = df_scatter4['Groot_hh_abs'].max() - df_scatter4['Groot_hh_abs'].min()
+        y_range = df_scatter4['Huizen_totaal_2025'].max() - df_scatter4['Huizen_totaal_2025'].min()
+        radius = max(x_range, y_range) * 0.8
+        for i, opacity in enumerate([0.12, 0.09, 0.06, 0.03, 0.01]):
+            r = radius * (1 - i * 0.18)
+            path = f'M {x_max},{y_0 + r} A {r},{r} 0 0 0 {x_max - r},{y_0} L {x_max},{y_0} Z'
+            fig14.add_shape(
+                type="path",
+                path=path,
+                fillcolor='#b91c1c',
+                opacity=opacity,
+                line=dict(width=0),
+                layer='below'
+            )
         st.plotly_chart(fig14, use_container_width=True)
+        st.markdown("<p style='font-size: 0.9em; color: #4a5568; font-style: italic;'>Hoge groei grote huishoudens met beperkte woningvoorraad (rechts onder) suggereert toekomstige capaciteitsproblemen voor gezinnen.</p>", unsafe_allow_html=True)
 
 with tab5:
     st.markdown("<h2 style='color: #1a202c;'>Volledige dataset</h2>", unsafe_allow_html=True)
