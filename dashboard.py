@@ -332,11 +332,11 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     total_huizen = df_filtered['Huizen_totaal_2025'].sum()
-    st.metric("Totaal Huizen (2025)", f"{int(total_huizen):,}")
+    st.metric("Totaal huizen (2025)", f"{int(total_huizen):,}")
 
 with col2:
-    total_flats = df_filtered['Appartementen_2025'].sum()
-    st.metric("Totaal Appartementen (2025)", f"{int(total_flats):,}")
+    total_flats = df_filtered['Flatgebouwen_2025'].sum()
+    st.metric("Totaal flatgebouwen (2025)", f"{int(total_flats):,}")
 
 with col3:
     nieuwbouw_recent = df_filtered['Woningen_Nieuwbouw_2022sep-2025aug'].sum()
@@ -347,7 +347,7 @@ with col4:
     st.metric("Renovaties 2022-2025 (36m)", f"{int(renovatie_recent):,}")
 
 # Tabs for different visualizations
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gebouwenpark", "Huishoudens", "Vergunningen", "Correlaties", "Alle Data"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gebouwenpark", "Huishoudens", "Vergunningen", "Correlaties", "Alle data"])
 
 with tab1:
     st.markdown("<h2 style='color: #1a202c;'>Gebouwenpark 2025</h2>", unsafe_allow_html=True)
@@ -362,8 +362,8 @@ with tab1:
             x='Huizen_totaal_2025',
             y='TX_REFNIS_NL',
             orientation='h',
-            title='Top 10 Gemeenten - Aantal Huizen',
-            labels={'Huizen_totaal_2025': 'Aantal Huizen', 'TX_REFNIS_NL': ''},
+            title='Top 10 gemeenten - aantal huizen',
+            labels={'Huizen_totaal_2025': 'Aantal huizen', 'TX_REFNIS_NL': ''},
             color='Huizen_totaal_2025',
             color_continuous_scale=[[0, '#3182ce'], [1, '#1a365d']]
         )
@@ -374,16 +374,16 @@ with tab1:
         st.plotly_chart(fig1, use_container_width=True)
     
     with col2:
-        # Top 10 gemeenten met meeste appartementen
-        top_flats = df_filtered.nlargest(10, 'Appartementen_2025')[['TX_REFNIS_NL', 'Appartementen_2025']]
+        # Top 10 gemeenten met meeste flatgebouwen
+        top_flats = df_filtered.nlargest(10, 'Flatgebouwen_2025')[['TX_REFNIS_NL', 'Flatgebouwen_2025']]
         fig2 = px.bar(
             top_flats,
-            x='Appartementen_2025',
+            x='Flatgebouwen_2025',
             y='TX_REFNIS_NL',
             orientation='h',
-            title='Top 10 Gemeenten - Aantal Appartementen',
-            labels={'Appartementen_2025': 'Aantal Appartementen', 'TX_REFNIS_NL': ''},
-            color='Appartementen_2025',
+            title='Top 10 gemeenten - aantal flatgebouwen',
+            labels={'Flatgebouwen_2025': 'Aantal flatgebouwen', 'TX_REFNIS_NL': ''},
+            color='Flatgebouwen_2025',
             color_continuous_scale=[[0, '#d97706'], [1, '#b91c1c']]
         )
         fig2.update_layout(**get_plotly_layout(), showlegend=False, height=450)
@@ -392,16 +392,16 @@ with tab1:
         fig2.update_yaxes(title_font=dict(color='#1a202c'), tickfont=dict(color='#1a202c'))
         st.plotly_chart(fig2, use_container_width=True)
     
-    # Ratio appartementen/huizen
+    # Ratio flats/huizen
     df_ratio = df_filtered.copy()
-    df_ratio['Flats_ratio'] = (df_ratio['Appartementen_2025'] / df_ratio['Huizen_totaal_2025'] * 100).round(2)
+    df_ratio['Flats_ratio'] = (df_ratio['Flatgebouwen_2025'] / df_ratio['Huizen_totaal_2025'] * 100).round(2)
     top_ratio = df_ratio.nlargest(15, 'Flats_ratio')[['TX_REFNIS_NL', 'Flats_ratio']]
     
     fig3 = px.bar(
         top_ratio,
         x='TX_REFNIS_NL',
         y='Flats_ratio',
-        title='Ratio Appartementen t.o.v. Totaal Huizen (%)',
+        title='Ratio flatgebouwen t.o.v. totaal huizen (%)',
         labels={'Flats_ratio': 'Percentage (%)', 'TX_REFNIS_NL': ''},
         color='Flats_ratio',
         color_continuous_scale=[[0, '#2d6a4f'], [1, '#14532d']]
@@ -419,7 +419,7 @@ with tab2:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("<h3 style='color: #1a202c;'>Percentage Toename per Huishoudensgrootte</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #1a202c;'>Percentage toename per huishoudensgrootte</h3>", unsafe_allow_html=True)
         
         hh_pct_cols = ['hh_1_pct_toename', 'hh_2_pct_toename', 'hh_3_pct_toename', 'hh_4+_pct_toename']
         df_hh_pct = df_filtered[['TX_REFNIS_NL'] + hh_pct_cols].copy()
@@ -436,7 +436,7 @@ with tab2:
             df_hh_pct_melt,
             x='Huishoudensgrootte',
             y='Percentage',
-            title='Distributie Percentage Toename',
+            title='Distributie percentage toename',
             labels={'Percentage': 'Toename (%)', 'Huishoudensgrootte': 'Grootte'},
             color='Huishoudensgrootte',
             color_discrete_sequence=COLORS['neutral']
@@ -446,7 +446,7 @@ with tab2:
         st.plotly_chart(fig4, use_container_width=True)
     
     with col2:
-        st.markdown("<h3 style='color: #1a202c;'>Absolute Toename per Huishoudensgrootte</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #1a202c;'>Absolute toename per huishoudensgrootte</h3>", unsafe_allow_html=True)
         
         hh_abs_cols = ['hh_1_abs_toename', 'hh_2_abs_toename', 'hh_3_abs_toename', 'hh_4+_abs_toename']
         df_hh_abs = df_filtered[['TX_REFNIS_NL'] + hh_abs_cols].copy()
@@ -460,8 +460,8 @@ with tab2:
             x='Totaal_toename',
             y='TX_REFNIS_NL',
             orientation='h',
-            title='Top 10 Gemeenten - Totale Toename Huishoudens',
-            labels={'Totaal_toename': 'Absolute Toename', 'TX_REFNIS_NL': 'Gemeente'},
+            title='Top 10 gemeenten - totale toename huishoudens',
+            labels={'Totaal_toename': 'Absolute toename', 'TX_REFNIS_NL': 'Gemeente'},
             color='Totaal_toename',
             color_continuous_scale=[[0, '#3182ce'], [1, '#1a365d']]
         )
@@ -470,7 +470,7 @@ with tab2:
         st.plotly_chart(fig5, use_container_width=True)
     
     # Gedetailleerde breakdown per gemeente (top 10)
-    st.markdown("<h3 style='color: #1a202c;'>Gedetailleerde Breakdown - Top 10 Gemeenten</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1a202c;'>Gedetailleerde breakdown - top 10 gemeenten</h3>", unsafe_allow_html=True)
     
     df_breakdown = df_filtered.copy()
     df_breakdown['Totaal_toename'] = df_breakdown[hh_abs_cols].sum(axis=1)
@@ -489,8 +489,8 @@ with tab2:
         x='TX_REFNIS_NL',
         y='Toename',
         color='Grootte',
-        title='Absolute Toename per Huishoudensgrootte (Top 10 Gemeenten)',
-        labels={'Toename': 'Absolute Toename', 'TX_REFNIS_NL': 'Gemeente'},
+        title='Absolute toename per huishoudensgrootte (top 10 gemeenten)',
+        labels={'Toename': 'Absolute toename', 'TX_REFNIS_NL': 'Gemeente'},
         barmode='group',
         color_discrete_sequence=COLORS['neutral']
     )
@@ -504,7 +504,7 @@ with tab3:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("<h3 style='color: #1a202c;'>Nieuwbouw Woningen</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #1a202c;'>Nieuwbouw woningen</h3>", unsafe_allow_html=True)
         
         # Vergelijking 36 maanden voor nieuwbouw
         df_nieuwbouw = df_filtered[['TX_REFNIS_NL', 
@@ -533,9 +533,9 @@ with tab3:
         ))
         layout = get_plotly_layout()
         layout.update(
-            title='Top 10 - Nieuwbouw Woningen (36 maanden)',
+            title='Top 10 - nieuwbouw woningen (36 maanden)',
             xaxis_title='Gemeente',
-            yaxis_title='Aantal Woningen',
+            yaxis_title='Aantal woningen',
             barmode='group',
             xaxis_tickangle=-45,
             height=450
@@ -548,7 +548,7 @@ with tab3:
             df_nieuwbouw.sort_values('Woningen_Nieuwbouw_pct_verschil_36m'),
             x='TX_REFNIS_NL',
             y='Woningen_Nieuwbouw_pct_verschil_36m',
-            title='Percentage Verschil Nieuwbouw Woningen',
+            title='Percentage verschil nieuwbouw woningen',
             labels={'Woningen_Nieuwbouw_pct_verschil_36m': 'Verschil (%)', 'TX_REFNIS_NL': 'Gemeente'},
             color='Woningen_Nieuwbouw_pct_verschil_36m',
             color_continuous_scale=['#b91c1c', '#d97706', '#2d6a4f'],
@@ -559,7 +559,7 @@ with tab3:
         st.plotly_chart(fig9, use_container_width=True)
     
     with col2:
-        st.markdown("<h3 style='color: #1a202c;'>Renovatie Gebouwen</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #1a202c;'>Renovatie gebouwen</h3>", unsafe_allow_html=True)
         
         # Vergelijking 36 maanden voor renovatie
         df_renovatie = df_filtered[['TX_REFNIS_NL', 
@@ -588,9 +588,9 @@ with tab3:
         ))
         layout = get_plotly_layout()
         layout.update(
-            title='Top 10 - Renovatie Gebouwen (36 maanden)',
+            title='Top 10 - renovatie gebouwen (36 maanden)',
             xaxis_title='Gemeente',
-            yaxis_title='Aantal Gebouwen',
+            yaxis_title='Aantal gebouwen',
             barmode='group',
             xaxis_tickangle=-45,
             height=450
@@ -603,7 +603,7 @@ with tab3:
             df_renovatie.sort_values('Gebouwen_Renovatie_pct_verschil_36m'),
             x='TX_REFNIS_NL',
             y='Gebouwen_Renovatie_pct_verschil_36m',
-            title='Percentage Verschil Renovatie Gebouwen',
+            title='Percentage verschil renovatie gebouwen',
             labels={'Gebouwen_Renovatie_pct_verschil_36m': 'Verschil (%)', 'TX_REFNIS_NL': 'Gemeente'},
             color='Gebouwen_Renovatie_pct_verschil_36m',
             color_continuous_scale=['#b91c1c', '#d97706', '#2d6a4f'],
@@ -614,7 +614,7 @@ with tab3:
         st.plotly_chart(fig10, use_container_width=True)
 
 with tab4:
-    st.markdown("<h2 style='color: #1a202c;'>Correlaties en Trends</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #1a202c;'>Correlaties en trends</h2>", unsafe_allow_html=True)
     
     # Scatter plots voor correlaties
     col1, col2 = st.columns(2)
@@ -630,11 +630,12 @@ with tab4:
             x='Totaal_hh_toename',
             y='Woningen_Nieuwbouw_2022sep-2025aug',
             text='TX_REFNIS_NL',
-            title='Voorspelde Huishoudensgroei (2025-2040) vs Recente Nieuwbouw (2022-2025)',
+            title='Voorspelde huishoudensgroei (2025-2040) vs recente nieuwbouw (2022-2025)',
             labels={
-                'Totaal_hh_toename': 'Totale Toename Huishoudens (voorspelling 2025-2040)',
-                'Woningen_Nieuwbouw_2022sep-2025aug': 'Nieuwbouw Woningen (sept 2022 - aug 2025)'
+                'Totaal_hh_toename': 'Totale toename huishoudens (voorspelling 2025-2040)',
+                'Woningen_Nieuwbouw_2022sep-2025aug': 'Nieuwbouw woningen (sept 2022 - aug 2025)'
             },
+            trendline='ols',
             size='Huizen_totaal_2025',
             color='Totaal_hh_toename',
             color_continuous_scale=[[0, '#3182ce'], [1, '#1a365d']]
@@ -644,9 +645,9 @@ with tab4:
         st.plotly_chart(fig11, use_container_width=True)
     
     with col2:
-        # Appartementen ratio vs huishoudens 1-2 personen
+        # Flatgebouwen ratio vs huishoudens 1-2 personen
         df_scatter2 = df_filtered.copy()
-        df_scatter2['Flats_ratio'] = (df_scatter2['Appartementen_2025'] / df_scatter2['Huizen_totaal_2025'] * 100)
+        df_scatter2['Flats_ratio'] = (df_scatter2['Flatgebouwen_2025'] / df_scatter2['Huizen_totaal_2025'] * 100)
         df_scatter2['Klein_hh_pct'] = df_scatter2['hh_1_pct_toename'] + df_scatter2['hh_2_pct_toename']
         df_scatter2 = df_scatter2.dropna(subset=['Flats_ratio', 'Klein_hh_pct'])
         
@@ -655,11 +656,12 @@ with tab4:
             x='Flats_ratio',
             y='Klein_hh_pct',
             text='TX_REFNIS_NL',
-            title='Huidige Appartementen Ratio (2025) vs Voorspelde Groei Kleine Huishoudens (2025-2040)',
+            title='Huidige flats ratio (2025) vs voorspelde groei kleine huishoudens (2025-2040)',
             labels={
-                'Flats_ratio': 'Ratio Appartementen (% van totaal, 2025)',
-                'Klein_hh_pct': 'Toename 1+2 Persoons HH (% voorspelling 2025-2040)'
+                'Flats_ratio': 'Ratio flatgebouwen (% van totaal, 2025)',
+                'Klein_hh_pct': 'Toename 1+2 persoons HH (% voorspelling 2025-2040)'
             },
+            trendline='ols',
             color='Huizen_totaal_2025',
             color_continuous_scale=[[0, '#d97706'], [1, '#b91c1c']]
         )
@@ -678,11 +680,12 @@ with tab4:
             x='Woningen_Nieuwbouw_2022sep-2025aug',
             y='Gebouwen_Renovatie_2022sep-2025aug',
             text='TX_REFNIS_NL',
-            title='Nieuwbouw vs Renovatie - Bouwactiviteit Laatste 3 Jaar (sept 2022 - aug 2025)',
+            title='Nieuwbouw vs renovatie - bouwactiviteit laatste 3 jaar (sept 2022 - aug 2025)',
             labels={
-                'Woningen_Nieuwbouw_2022sep-2025aug': 'Nieuwbouw Woningen (sept 2022 - aug 2025)',
-                'Gebouwen_Renovatie_2022sep-2025aug': 'Renovatie Gebouwen (sept 2022 - aug 2025)'
+                'Woningen_Nieuwbouw_2022sep-2025aug': 'Nieuwbouw woningen (sept 2022 - aug 2025)',
+                'Gebouwen_Renovatie_2022sep-2025aug': 'Renovatie gebouwen (sept 2022 - aug 2025)'
             },
+            trendline='ols',
             color='Huizen_totaal_2025',
             color_continuous_scale=[[0, '#2d6a4f'], [1, '#14532d']]
         )
@@ -701,12 +704,13 @@ with tab4:
             x='Huizen_totaal_2025',
             y='Groot_hh_abs',
             text='TX_REFNIS_NL',
-            title='Huidige Woningvoorraad (2025) vs Voorspelde Groei Grote Huishoudens (2025-2040)',
+            title='Huidige woningvoorraad (2025) vs voorspelde groei grote huishoudens (2025-2040)',
             labels={
-                'Huizen_totaal_2025': 'Totaal Huizen (stand 2025)',
-                'Groot_hh_abs': 'Toename 3-4+ Persoons HH (voorspelling 2025-2040)'
+                'Huizen_totaal_2025': 'Totaal huizen (stand 2025)',
+                'Groot_hh_abs': 'Toename 3-4+ persoons HH (voorspelling 2025-2040)'
             },
-            color='Appartementen_2025',
+            trendline='ols',
+            color='Flatgebouwen_2025',
             color_continuous_scale=[[0, '#f59e0b'], [1, '#d97706']]
         )
         fig14.update_layout(**get_plotly_layout(), height=450, coloraxis_colorbar_title_text="")
@@ -714,10 +718,10 @@ with tab4:
         st.plotly_chart(fig14, use_container_width=True)
 
 with tab5:
-    st.markdown("<h2 style='color: #1a202c;'>Volledige Dataset</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #1a202c;'>Volledige dataset</h2>", unsafe_allow_html=True)
     
     # Sectie voor het kiezen van specifieke gemeenten
-    st.markdown("<h3 style='color: #1a202c;'>Selecteer Gemeente voor Details</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1a202c;'>Selecteer gemeente voor details</h3>", unsafe_allow_html=True)
     selected_gemeente = st.selectbox(
         "Kies een gemeente:",
         options=['Alle gemeenten'] + sorted(df_filtered['TX_REFNIS_NL'].unique().tolist())
@@ -731,19 +735,19 @@ with tab5:
         
         with col1:
             st.markdown("### Gebouwenpark 2025")
-            st.metric("Totaal Huizen", f"{int(gemeente_data['Huizen_totaal_2025']):,}")
-            st.metric("Appartementen", f"{int(gemeente_data['Appartementen_2025']):,}")
-            st.metric("Appartementen Ratio", f"{(gemeente_data['Appartementen_2025']/gemeente_data['Huizen_totaal_2025']*100):.2f}%")
+            st.metric("Totaal huizen", f"{int(gemeente_data['Huizen_totaal_2025']):,}")
+            st.metric("Flatgebouwen", f"{int(gemeente_data['Flatgebouwen_2025']):,}")
+            st.metric("Flats ratio", f"{(gemeente_data['Flatgebouwen_2025']/gemeente_data['Huizen_totaal_2025']*100):.2f}%")
         
         with col2:
-            st.markdown("### Huishoudens Toename 2025-2040")
-            st.markdown("**Percentage Toename:**")
+            st.markdown("### Huishoudens toename 2025-2040")
+            st.markdown("**Percentage toename:**")
             st.write(f"• 1 persoon: {gemeente_data['hh_1_pct_toename']:.2f}%")
             st.write(f"• 2 personen: {gemeente_data['hh_2_pct_toename']:.2f}%")
             st.write(f"• 3 personen: {gemeente_data['hh_3_pct_toename']:.2f}%")
             st.write(f"• 4+ personen: {gemeente_data['hh_4+_pct_toename']:.2f}%")
             
-            st.markdown("**Absolute Toename:**")
+            st.markdown("**Absolute toename:**")
             st.write(f"• 1 persoon: {int(gemeente_data['hh_1_abs_toename']):,}")
             st.write(f"• 2 personen: {int(gemeente_data['hh_2_abs_toename']):,}")
             st.write(f"• 3 personen: {int(gemeente_data['hh_3_abs_toename']):,}")
@@ -751,18 +755,18 @@ with tab5:
             
             totaal_toename = (gemeente_data['hh_1_abs_toename'] + gemeente_data['hh_2_abs_toename'] + 
                             gemeente_data['hh_3_abs_toename'] + gemeente_data['hh_4+_abs_toename'])
-            st.metric("Totale Toename", f"{int(totaal_toename):,}")
+            st.metric("Totale toename", f"{int(totaal_toename):,}")
         
         with col3:
             st.markdown("### Vergunningen (36 maanden)")
             
             if pd.notna(gemeente_data['Woningen_Nieuwbouw_2019sep-2022aug']):
-                st.markdown("**Nieuwbouw Woningen:**")
+                st.markdown("**Nieuwbouw woningen:**")
                 st.write(f"• 2019-2022: {int(gemeente_data['Woningen_Nieuwbouw_2019sep-2022aug']):,}")
                 st.write(f"• 2022-2025: {int(gemeente_data['Woningen_Nieuwbouw_2022sep-2025aug']):,}")
                 st.metric("Verschil", f"{gemeente_data['Woningen_Nieuwbouw_pct_verschil_36m']:.2f}%")
                 
-                st.markdown("**Renovatie Gebouwen:**")
+                st.markdown("**Renovatie gebouwen:**")
                 st.write(f"• 2019-2022: {int(gemeente_data['Gebouwen_Renovatie_2019sep-2022aug']):,}")
                 st.write(f"• 2022-2025: {int(gemeente_data['Gebouwen_Renovatie_2022sep-2025aug']):,}")
                 st.metric("Verschil", f"{gemeente_data['Gebouwen_Renovatie_pct_verschil_36m']:.2f}%")
@@ -771,7 +775,7 @@ with tab5:
         
         # Visualisatie voor huishoudens van de gemeente
         st.markdown("---")
-        st.markdown(f"<h3 style='color: #1a202c;'>Huishoudens Breakdown - {selected_gemeente}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='color: #1a202c;'>Huishoudens breakdown - {selected_gemeente}</h3>", unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
         
@@ -791,7 +795,7 @@ with tab5:
                 hh_pct_data,
                 x='Grootte',
                 y='Percentage',
-                title='Percentage Toename per Huishoudensgrootte',
+                title='Percentage toename per huishoudensgrootte',
                 color='Percentage',
                 color_continuous_scale=[[0, '#3182ce'], [1, '#1a365d']]
             )
@@ -815,7 +819,7 @@ with tab5:
                 hh_abs_data,
                 x='Grootte',
                 y='Toename',
-                title='Absolute Toename per Huishoudensgrootte',
+                title='Absolute toename per huishoudensgrootte',
                 color='Toename',
                 color_continuous_scale=[[0, '#2d6a4f'], [1, '#14532d']]
             )
@@ -826,7 +830,7 @@ with tab5:
         # Vergunningen visualisatie
         if pd.notna(gemeente_data['Woningen_Nieuwbouw_2019sep-2022aug']):
             st.markdown("---")
-            st.markdown(f"<h3 style='color: #1a202c;'>Vergunningen Evolutie - {selected_gemeente}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color: #1a202c;'>Vergunningen evolutie - {selected_gemeente}</h3>", unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
             
@@ -843,7 +847,7 @@ with tab5:
                     nieuwbouw_data,
                     x='Periode',
                     y='Aantal',
-                    title='Nieuwbouw Woningen',
+                    title='Nieuwbouw woningen',
                     color='Aantal',
                     color_continuous_scale=[[0, '#f59e0b'], [1, '#d97706']]
                 )
@@ -864,7 +868,7 @@ with tab5:
                     renovatie_data,
                     x='Periode',
                     y='Aantal',
-                    title='Renovatie Gebouwen',
+                    title='Renovatie gebouwen',
                     color='Aantal',
                     color_continuous_scale=[[0, '#d97706'], [1, '#b91c1c']]
                 )
@@ -874,7 +878,7 @@ with tab5:
     
     # Volledige data tabel
     st.markdown("---")
-    st.markdown("<h3 style='color: #1a202c;'>Volledige Data Tabel - Alle Variabelen</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1a202c;'>Volledige datatabel - alle variabelen</h3>", unsafe_allow_html=True)
     
     # Maak een mooie weergave van alle kolommen
     display_df = df_filtered.copy()
@@ -883,7 +887,7 @@ with tab5:
     column_names = {
         'TX_REFNIS_NL': 'Gemeente',
         'Huizen_totaal_2025': 'Huizen 2025',
-        'Appartementen_2025': 'Appartementen 2025',
+        'Flatgebouwen_2025': 'Flatgebouwen 2025',
         'hh_1_pct_toename': 'HH 1p %',
         'hh_2_pct_toename': 'HH 2p %',
         'hh_3_pct_toename': 'HH 3p %',
@@ -901,7 +905,7 @@ with tab5:
     }
     
     # Selecteer en hernoem kolommen
-    cols_to_show = ['TX_REFNIS_NL', 'Huizen_totaal_2025', 'Appartementen_2025',
+    cols_to_show = ['TX_REFNIS_NL', 'Huizen_totaal_2025', 'Flatgebouwen_2025',
                     'hh_1_pct_toename', 'hh_2_pct_toename', 'hh_3_pct_toename', 'hh_4+_pct_toename',
                     'hh_1_abs_toename', 'hh_2_abs_toename', 'hh_3_abs_toename', 'hh_4+_abs_toename',
                     'Woningen_Nieuwbouw_2019sep-2022aug', 'Woningen_Nieuwbouw_2022sep-2025aug', 'Woningen_Nieuwbouw_pct_verschil_36m',
@@ -935,7 +939,7 @@ with tab5:
     st.markdown("---")
     csv = df_filtered.to_csv(index=False).encode('utf-8')
     st.download_button(
-        label="Download Volledige Dataset als CSV",
+        label="Download volledige dataset als CSV",
         data=csv,
         file_name='halle-vilvoorde-data.csv',
         mime='text/csv'
@@ -943,31 +947,30 @@ with tab5:
     
     # Statistieken
     st.markdown("---")
-    st.markdown("<h3 style='color: #1a202c;'>Dataset Statistieken</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1a202c;'>Dataset statistieken</h3>", unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Aantal Gemeenten", len(df_filtered))
+        st.metric("Aantal gemeenten", len(df_filtered))
     
     with col2:
         avg_huizen = df_filtered['Huizen_totaal_2025'].mean()
-        st.metric("Gem. Huizen per Gemeente", f"{int(avg_huizen):,}")
+        st.metric("Gem. huizen per gemeente", f"{int(avg_huizen):,}")
     
     with col3:
         total_hh_toename = df_filtered[['hh_1_abs_toename', 'hh_2_abs_toename', 
                                         'hh_3_abs_toename', 'hh_4+_abs_toename']].sum().sum()
-        st.metric("Totale HH Toename 2025-2040", f"{int(total_hh_toename):,}")
+        st.metric("Totale HH toename 2025-2040", f"{int(total_hh_toename):,}")
     
     with col4:
         avg_nieuwbouw_verschil = df_filtered['Woningen_Nieuwbouw_pct_verschil_36m'].mean()
-        st.metric("Gem. Nieuwbouw Verschil", f"{avg_nieuwbouw_verschil:.2f}%")
+        st.metric("Gem. nieuwbouw verschil", f"{avg_nieuwbouw_verschil:.2f}%")
 
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #718096; font-size: 0.875rem; padding: 1.5rem 0;'>
     <p style='margin: 0;'>Halle-Vilvoorde Dashboard • Data bijgewerkt: januari 2026</p>
-    <p style='margin: 0.4rem 0 0;'>Bronvermeldingen: Gebouwenpark: Statbel, Huishoudens: Statistiek Vlaanderen, Vergunningen: Statbel</p>
 </div>
 """, unsafe_allow_html=True)
