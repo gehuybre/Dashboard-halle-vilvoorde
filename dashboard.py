@@ -266,7 +266,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Load data
-@st.cache_data
+@st.cache_data(ttl=60)  # Cache voor 60 seconden, daarna opnieuw laden
 def load_data():
     df = pd.read_csv('nis/halle-vilvoorde.csv')
     return df
@@ -413,7 +413,7 @@ with tab1:
     st.plotly_chart(fig3, use_container_width=True)
 
 with tab2:
-    st.markdown("<h2 style='color: #1a202c;'>Huishoudens - Voorspelde Toename 2025-2040</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #1a202c;'>Huishoudens - voorspelde toename 2025-2040</h2>", unsafe_allow_html=True)
     
     # Percentage toename per huishoudensgrootte
     col1, col2 = st.columns(2)
@@ -499,7 +499,7 @@ with tab2:
     st.plotly_chart(fig6, use_container_width=True)
 
 with tab3:
-    st.markdown("<h2 style='color: #1a202c;'>Bouwvergunningen - 36 Maanden Vergelijking</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #1a202c;'>Bouwvergunningen - 36 maanden vergelijking</h2>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -796,6 +796,67 @@ with tab4:
             )
         st.plotly_chart(fig14, use_container_width=True)
         st.markdown("<p style='font-size: 0.9em; color: #4a5568; font-style: italic;'>Hoge groei grote huishoudens met beperkte woningvoorraad (rechts onder) suggereert toekomstige capaciteitsproblemen voor gezinnen.</p>", unsafe_allow_html=True)
+    
+    # Totaal woongelegenheden vs totaal huishoudens 2025
+    df_scatter5 = df_filtered.copy()
+    df_scatter5['Totaal_hh_2025'] = (
+        df_scatter5['hh_1_2025'] + 
+        df_scatter5['hh_2_2025'] + 
+        df_scatter5['hh_3_2025'] + 
+        df_scatter5['hh_4+_2025']
+    )
+    df_scatter5 = df_scatter5.dropna(subset=['Huizen_totaal_2025', 'Totaal_hh_2025'])
+    
+    fig15 = px.scatter(
+        df_scatter5,
+        x='Totaal_hh_2025',
+        y='Huizen_totaal_2025',
+        text='TX_REFNIS_NL',
+        title='Totaal aantal huishoudens (2025) vs totaal aantal woongelegenheden (2025)',
+        labels={
+            'Totaal_hh_2025': 'Totaal aantal huishoudens (2025)',
+            'Huizen_totaal_2025': 'Totaal aantal woongelegenheden (2025)'
+        },
+        trendline='ols',
+        size='Huizen_totaal_2025',
+        color='Totaal_hh_2025',
+        color_continuous_scale=[[0, '#3182ce'], [1, '#1a365d']]
+    )
+    
+    # Voeg referentielijn toe voor Vlaams gemiddelde (1.14 woningen per huishouden)
+    x_max = df_scatter5['Totaal_hh_2025'].max()
+    fig15.add_trace(go.Scatter(
+        x=[0, x_max],
+        y=[0, x_max * 1.14],
+        mode='lines',
+        name='Vlaams gemiddelde (1.14)',
+        line=dict(color='#2d6a4f', width=2, dash='dash'),
+        showlegend=True
+    ))
+    
+    layout = get_plotly_layout()
+    layout.update(dict(
+        height=450, 
+        coloraxis_colorbar_title_text="",
+        xaxis=dict(
+            range=[0, 20000],
+            gridcolor='#e2e8f0',
+            linecolor='#cbd5e0',
+            tickfont=dict(size=11, color='#1a202c'),
+            title_font=dict(size=12, color='#1a202c')
+        ),
+        yaxis=dict(
+            range=[0, 15000],
+            gridcolor='#e2e8f0',
+            linecolor='#cbd5e0',
+            tickfont=dict(size=11, color='#1a202c'),
+            title_font=dict(size=12, color='#1a202c')
+        )
+    ))
+    fig15.update_layout(**layout)
+    fig15.update_traces(textposition='top center', textfont_size=8, marker_line_color='#ffffff', marker_line_width=1, selector=dict(mode='markers'))
+    st.plotly_chart(fig15, use_container_width=True)
+    st.markdown("<p style='font-size: 0.9em; color: #4a5568; font-style: italic;'>De stippellijn toont het Vlaams gemiddelde van 1.14 woningen per huishouden (voor frictionele leegstand, tweedeverblijven, studentenhuisvesting). Gemeenten onder deze lijn hebben relatief minder woningen per huishouden.</p>", unsafe_allow_html=True)
 
 with tab5:
     st.markdown("<h2 style='color: #1a202c;'>Volledige dataset</h2>", unsafe_allow_html=True)

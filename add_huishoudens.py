@@ -4,6 +4,12 @@ import pandas as pd
 hv = pd.read_csv('nis/halle-vilvoorde.csv')
 huishoudens = pd.read_csv('huishoudens/huishoudens.csv')
 
+# Verwijder eventuele bestaande huishoudens kolommen om duplicaten te voorkomen
+hh_cols_to_remove = [col for col in hv.columns if col.startswith('hh_')]
+if hh_cols_to_remove:
+    print(f"Verwijderen van bestaande huishoudens kolommen: {hh_cols_to_remove}")
+    hv = hv.drop(columns=hh_cols_to_remove)
+
 # Filter voor 2025 en 2040
 hh_2025 = huishoudens[huishoudens['jaar'] == 2025].copy()
 hh_2040 = huishoudens[huishoudens['jaar'] == 2040].copy()
@@ -29,14 +35,19 @@ for grootte in ['1', '2', '3', '4+']:
     # Percentage toename
     hh_combined[f'hh_{grootte}_pct_toename'] = ((hh_combined[col_2040] - hh_combined[col_2025]) / hh_combined[col_2025] * 100).round(2)
 
-# Selecteer alleen de kolommen die we nodig hebben (percentage en absolute toename)
-toename_cols = []
+# Selecteer de kolommen die we nodig hebben (2025 totalen, percentage en absolute toename)
+output_cols = []
+# Eerst de 2025 totalen
 for grootte in ['1', '2', '3', '4+']:
-    toename_cols.append(f'hh_{grootte}_pct_toename')
+    output_cols.append(f'hh_{grootte}_2025')
+# Dan percentage toename
 for grootte in ['1', '2', '3', '4+']:
-    toename_cols.append(f'hh_{grootte}_abs_toename')
+    output_cols.append(f'hh_{grootte}_pct_toename')
+# Dan absolute toename
+for grootte in ['1', '2', '3', '4+']:
+    output_cols.append(f'hh_{grootte}_abs_toename')
 
-hh_toename = hh_combined[toename_cols].copy()
+hh_toename = hh_combined[output_cols].copy()
 
 # Reset index om niscode als kolom te krijgen
 hh_toename = hh_toename.reset_index()
@@ -52,5 +63,5 @@ result.to_csv('nis/halle-vilvoorde.csv', index=False)
 
 print("Huishoudens data succesvol toegevoegd aan nis/halle-vilvoorde.csv")
 print(f"\nToegevoegde kolommen:")
-for col in toename_cols:
+for col in output_cols:
     print(f"  - {col}")
