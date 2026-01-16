@@ -374,15 +374,15 @@ with tab1:
         st.plotly_chart(fig1, use_container_width=True)
     
     with col2:
-        # Top 10 gemeenten met meeste flatgebouwen
+        # Top 10 gemeenten met meeste appartementen
         top_flats = df_filtered.nlargest(10, 'Appartementen_2025')[['TX_REFNIS_NL', 'Appartementen_2025']]
         fig2 = px.bar(
             top_flats,
             x='Appartementen_2025',
             y='TX_REFNIS_NL',
             orientation='h',
-            title='Top 10 gemeenten - aantal flatgebouwen',
-            labels={'Appartementen_2025': 'Aantal flatgebouwen', 'TX_REFNIS_NL': ''},
+            title='Top 10 gemeenten - aantal appartementen',
+            labels={'Appartementen_2025': 'Aantal appartementen', 'TX_REFNIS_NL': ''},
             color='Appartementen_2025',
             color_continuous_scale=[[0, '#d97706'], [1, '#b91c1c']]
         )
@@ -401,7 +401,7 @@ with tab1:
         top_ratio,
         x='TX_REFNIS_NL',
         y='Flats_ratio',
-        title='Ratio flatgebouwen t.o.v. totaal huizen (%)',
+        title='Ratio appartementen t.o.v. totaal huizen (%)',
         labels={'Flats_ratio': 'Percentage (%)', 'TX_REFNIS_NL': ''},
         color='Flats_ratio',
         color_continuous_scale=[[0, '#2d6a4f'], [1, '#14532d']]
@@ -645,7 +645,7 @@ with tab4:
         st.plotly_chart(fig11, use_container_width=True)
     
     with col2:
-        # Flatgebouwen ratio vs huishoudens 1-2 personen
+        # Appartementen ratio vs huishoudens 1-2 personen
         df_scatter2 = df_filtered.copy()
         df_scatter2['Flats_ratio'] = (df_scatter2['Appartementen_2025'] / df_scatter2['Huizen_totaal_2025'] * 100)
         df_scatter2['Klein_hh_pct'] = df_scatter2['hh_1_pct_toename'] + df_scatter2['hh_2_pct_toename']
@@ -658,7 +658,7 @@ with tab4:
             text='TX_REFNIS_NL',
             title='Huidige flats ratio (2025) vs voorspelde groei kleine huishoudens (2025-2040)',
             labels={
-                'Flats_ratio': 'Ratio flatgebouwen (% van totaal, 2025)',
+                'Flats_ratio': 'Ratio appartementen (% van totaal, 2025)',
                 'Klein_hh_pct': 'Toename 1+2 persoons HH (% voorspelling 2025-2040)'
             },
             trendline='ols',
@@ -736,7 +736,7 @@ with tab5:
         with col1:
             st.markdown("### Gebouwenpark 2025")
             st.metric("Totaal huizen", f"{int(gemeente_data['Huizen_totaal_2025']):,}")
-            st.metric("Flatgebouwen", f"{int(gemeente_data['Appartementen_2025']):,}")
+            st.metric("Appartementen", f"{int(gemeente_data['Appartementen_2025']):,}")
             st.metric("Flats ratio", f"{(gemeente_data['Appartementen_2025']/gemeente_data['Huizen_totaal_2025']*100):.2f}%")
         
         with col2:
@@ -887,7 +887,7 @@ with tab5:
     column_names = {
         'TX_REFNIS_NL': 'Gemeente',
         'Huizen_totaal_2025': 'Huizen 2025',
-        'Appartementen_2025': 'Flatgebouwen 2025',
+        'Appartementen_2025': 'Appartementen 2025',
         'hh_1_pct_toename': 'HH 1p %',
         'hh_2_pct_toename': 'HH 2p %',
         'hh_3_pct_toename': 'HH 3p %',
