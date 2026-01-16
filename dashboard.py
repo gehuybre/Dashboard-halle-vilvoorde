@@ -335,8 +335,8 @@ with col1:
     st.metric("Totaal huizen (2025)", f"{int(total_huizen):,}")
 
 with col2:
-    total_flats = df_filtered['Flatgebouwen_2025'].sum()
-    st.metric("Totaal flatgebouwen (2025)", f"{int(total_flats):,}")
+    total_flats = df_filtered['Appartementen_2025'].sum()
+    st.metric("Totaal appartementen (2025)", f"{int(total_flats):,}")
 
 with col3:
     nieuwbouw_recent = df_filtered['Woningen_Nieuwbouw_2022sep-2025aug'].sum()
